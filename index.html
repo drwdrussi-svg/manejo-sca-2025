@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manejo del Síndrome Coronario Agudo (2025) – Algoritmo Interactivo</title>
+ <meta name="description" content="Herramienta de decisión clínica para el manejo del síndrome coronario agudo (SCA) alineada con las directrices ESC 2025." />
+  <style>
+    :root{
+      --bg:#052e1b;
+      --bg2:#0a3a22;
+      --card:#0e2d1f;
+      --muted:#a7f3d0;
+      --text:#ecfdf5;
+      --accent:#34d399;
+      --accent2:#6ee7b7;
+      --ok:#10b981;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --border:#134e4a;
+      --chip:#062418;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #0f5131 10%, transparent 50%),
+        radial-gradient(1400px 900px at 120% 20%, #064e3b 10%, transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      color:var(--text);
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    header{max-width:1100px;margin:32px auto 12px;padding:0 16px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{
+      width:44px;height:44px;border-radius:12px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      box-shadow:0 8px 30px #34d39944
+    }
+    h1{margin:0;font-size:clamp(22px,2.8vw,36px);letter-spacing:.3px}
+    .subtitle{margin-top:6px;color:var(--muted)}
+    main{max-width:1100px;margin:16px auto 80px;padding:0 16px;}
+    .card{
+      background:linear-gradient(180deg, #0b2419, #0b2419cc 60%, #0b241980);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 8px 30px #00000055;
+      margin-bottom: 18px;
+    }
+    .card h2{margin:0;padding:18px 18px 0;font-size:clamp(18px,2.2vw,22px)}
+    .card .content{padding:16px 18px 18px;}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px;}
+    input, select{width:100%;background:#052317;color:var(--text);border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px;outline:none;}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+    .hint{font-size:12px;color:var(--muted);margin-top:8px;}
+    .actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+    button{cursor:pointer;border:1px solid var(--border);background:linear-gradient(180deg,#0b2419,#052015);color:#fff;padding:10px 14px;border-radius:12px;font-weight:600;font-size:14px;}
+    button.primary{background:linear-gradient(180deg,#10b981,#059669);border-color:#047857;}
+    button.ghost{background:transparent;}
+    .step{display:none;}
+    .step.active{display:block;}
+    .info-box{background:var(--chip);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:16px;}
+    .info-box h4{margin-top:0; color: var(--accent);}
+    .lead-selector {display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-top: 10px;}
+    .lead-selector label {font-size: 12px; text-align: center; cursor: pointer;}
+    .lead-selector input {display: none;}
+    .lead-selector .chip {display: block; padding: 8px; border-radius: 8px; border: 1px solid var(--border); transition: all 0.2s;}
+    .lead-selector input:checked + .chip {background: var(--accent); color: var(--bg); font-weight: bold;}
+    .contraindications-list { list-style: none; padding: 0; }
+    .contraindications-list li { margin-bottom: 10px; }
+    .contraindications-list input { width: auto; margin-right: 8px; vertical-align: middle; }
+    .warning { border-left: 4px solid var(--warn); padding-left: 12px; color: var(--warn); }
+    .error { border-left: 4px solid var(--bad); padding-left: 12px; color: var(--bad); }
+    .success { border-left: 4px solid var(--ok); padding-left: 12px; color: var(--ok); }
+    #summaryPanel { position: sticky; top: 20px; }
+    .summary-item { margin-bottom: 12px; }
+    .summary-item strong { color: var(--text); }
+    .calculated-value { font-weight: bold; color: var(--accent2); font-size: 1.1em; }
+    .calculation-result { margin-top: 12px; padding: 12px; background: #062418; border-radius: 12px; border: 1px solid var(--border); }
+ </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <h1>Manejo del Síndrome Coronario Agudo (2025)</h1>
+        <div class="subtitle">Algoritmo de Decisión Clínica Interactivo. Alineado con las directrices ESC 2025.</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px;">
+      <!-- ALGORITMO PRINCIPAL -->
+      <section>
+        <!-- Paso 1: Datos Demográficos -->
+        <div class="card step active" data-step="1">
+          <h2>Paso 1: Datos del Paciente</h2>
+          <div class="content">
+            <div class="row">
+              <div>
+                <label for="sex">Sexo</label>
+                <select id="sex">
+                  <option value="">Seleccione</option>
+                  <option value="M">Masculino</option>
+                  <option value="F">Femenino</option>
+                </select>
+              </div>
+              <div>
+                <label for="age">Edad (años)</label>
+                <input type="number" id="age" min="18" max="110" step="1" placeholder="Ej: 64" />
+              </div>
+            </div>
+            <div style="margin-top: 12px;">
+              <label for="weight">Peso (kg) - *Requerido para dosificación*</label>
+              <input type="number" id="weight" min="30" max="200" step="0.1" placeholder="Ej: 75.5" />
+            </div>
+            <div class="actions">
+              <button class="primary" data-next="2">Siguiente</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 2: Caracterización del Dolor -->
+        <div class="card step" data-step="2">
+          <h2>Paso 2: Caracterización del Dolor Torácico</h2>
+          <div class="content">
+            <p>El dolor es sugestivo de isquemia miocárdica (anginoso)?</p>
+            <div class="hint">
+              Se considera angina típica si es: 1) Opresivo/retroesternal, 2) Provocado por esfuerzo o estrés y aliviado por reposo/nitritos, 3) Irradia a mandíbula, brazo izquierdo o espalda. Se considera atípico si cumple solo 1 o 2 criterios.
+            </div>
+            <div style="margin-top: 16px;">
+              <label><input type="radio" name="painType" value="tipico"> Sí, dolor anginoso típico o atípico.</label>
+              <label><input type="radio" name="painType" value="no-isquemico"> No, el dolor es claramente no isquémico.</label>
+            </div>
+            <div class="actions">
+              <button class="ghost" data-back="1">Volver</button>
+              <button class="primary" data-next="3" data-require="painType">Siguiente</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Paso 3: ECG -->
+        <div class="card step" data-step="3">
+          <h2>Paso 3: Análisis del ECG de 12 Derivaciones</h2>
+          <div class="content">
+            <div class="info-box">
+              <h4>Criterios de Cambios Isquémicos Agudos (2025)</h4>
+              <p><strong>Elevación del ST:</strong></p>
+              <p><strong>En hombres:</strong> Elevación del ST ≥ 1 mm en ≥ 2 derivaciones contiguas (excepto V2-V3).</p>
+              <p><strong>En mujeres:</strong> Elevación del ST ≥ 1.5 mm en ≥ 2 derivaciones contiguas (excepto V2-V3).</p>
+              <p><strong>En V2-V3 (Hombres ≥40a):</strong> ≥ 2 mm. <strong>(Mujeres):</strong> ≥ 1.5 mm. <strong>(Hombres <40a):</strong> ≥ 2.5 mm.</p>
+              <p><strong>Equivalente de ST:</strong> Bloqueo de Rama Izquierda (BRI) nuevo o presumiblemente nuevo.</p>
+              <hr style="border-color: var(--border); margin: 12px 0;">
+              <p><strong>Depresión del ST o Inversión de T:</strong> Depresión del ST horizontal o descendente (>0.5 mm) o inversión de onda T simétrica y profunda (>1 mm) en derivaciones contiguas también son altamente sugestivos de isquemia aguda.</p>
+            </div>
+            <p style="margin-top: 20px;">¿El ECG muestra cambios sugestivos de isquemia (elevación y/o depresión del ST, o cambios de la onda T)?</p>
+            <div class="hint">
+              Use los criterios de arriba como referencia para identificar cualquier cambio agudo.
+            </div>
+            <div style="margin-top: 16px;">
+              <label><input type="radio" name="ecgChanges" value="si"> Sí, hay cambios isquémicos agudos.</label>
+              <label><input type="radio" name="ecgChanges" value="no"> No, el ECG es normal o sin cambios agudos.</label>
+            </div>
+            <div class="actions">
+              <button class="ghost" data-back="2">Volver</button>
+              <button class="primary" data-next="4" data-require="ecgChanges">Siguiente</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 4: Localización ECG (para todos los cambios) -->
+        <div class="card step" data-step="4">
+          <h2>Paso 4: Localización ECG y Cambios Clave</h2>
+          <div class="content">
+            <p>Seleccione las derivaciones con los cambios más significativos (elevación, depresión o inversión de T):</p>
+            <div class="lead-selector">
+              <label><input type="checkbox" name="lead" value="V1"><span class="chip">V1</span></label>
+              <label><input type="checkbox" name="lead" value="V2"><span class="chip">V2</span></label>
+              <label><input type="checkbox" name="lead" value="V3"><span class="chip">V3</span></label>
+              <label><input type="checkbox" name="lead" value="V4"><span class="chip">V4</span></label>
+              <label><input type="checkbox" name="lead" value="V5"><span class="chip">V5</span></label>
+              <label><input type="checkbox" name="lead" value="V6"><span class="chip">V6</span></label>
+              <label><input type="checkbox" name="lead" value="I"><span class="chip">I</span></label>
+              <label><input type="checkbox" name="lead" value="aVL"><span class="chip">aVL</span></label>
+              <label><input type="checkbox" name="lead" value="II"><span class="chip">II</span></label>
+              <label><input type="checkbox" name="lead" value="III"><span class="chip">III</span></label>
+              <label><input type="checkbox" name="lead" value="aVF"><span class="chip">aVF</span></label>
+            </div>
+            <div id="locationResult" class="info-box" style="display:none;">
+              <h4>Localización Probable</h4>
+              <p><strong>Cara:</strong> <span id="face">--</span></p>
+              <p><strong>Arteria Culpable Probable:</strong> <span id="artery">--</span></p>
+              <p id="posteriorLeadsHint" class="warning" style="display:none;">Considerar registrar derivaciones posteriores (V7-V9) para confirmar extensión.</p>
+            </div>
+            <div class="actions">
+              <button class="ghost" data-back="3">Volver</button>
+              <button class="primary" data-next="5" data-require="lead">Siguiente</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 5: Clasificación de la Lesión Isquémica -->
+        <div class="card step" data-step="5">
+          <h2>Paso 5: Clasificación de la Lesión Isquémica</h2>
+          <div class="content">
+            <div class="info-box">
+              <h4>Patrón de Lesión</h4>
+              <p>Basado en los cambios del ECG, clasifique el tipo de lesión isquémica predominante.</p>
+              <p><strong>Lesión Subepicárdica (Transmural):</strong> Corresponde a elevación del ST. Indica necrosis de espesor completo de la pared ventricular.</p>
+              <p><strong>Lesión Subendocárdica (No Transmural):</strong> Corresponde a depresión del ST o inversión de onda T. Indica necrosis parcial o isquemia severa sin necrosis completa.</p>
+            </div>
+            <p style="margin-top: 20px;">¿Cuál es el patrón principal de lesión en este ECG?</p>
+            <div style="margin-top: 16px;">
+              <label><input type="radio" name="lesionType" value="subepicardic"> Elevación del ST (Lesión Subepicárdica/Transmural)</label>
+              <label><input type="radio" name="lesionType" value="subendocardic"> Depresión del ST / Inversión de T (Lesión Subendocárdica)</label>
+            </div>
+            <div class="actions">
+              <button class="ghost" data-back="4">Volver</button>
+              <button class="primary" data-next="6" data-require="lesionType">Siguiente</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Paso 6A: Rama Subepicárdica (STEIMI) -->
+        <div class="card step" data-step="6">
+          <h2>Paso 6: Estrategia de Reperfusión (Lesión Subepicárdica)</h2>
+          <div class="content">
+            <p>¿El paciente se encuentra en un centro con disponibilidad de sala de hemodinamia y puede ser atendido en un tiempo estimado puerta-balón ≤ 90 minutos?</p>
+            <div style="margin-top: 16px;">
+              <label><input type="radio" name="hemodinamia" value="si"> Sí, se puede realizar Angioplastía Primaria (PCI) de forma oportuna.</label>
+              <label><input type="radio" name="hemodinamia" value="no"> No, el tiempo estimado a PCI es > 90 minutos.</label>
+            </div>
+            <div class="actions">
+              <button class="ghost" data-back="5">Volver</button>
+              <button class="primary" data-next="7" data-require="hemodinamia">Siguiente</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 7A: Manejo - Angioplastía Primaria -->
+        <div class="card step" data-step="7">
+          <h2>Manejo: Angioplastía Primaria (PCI)</h2>
+          <div class="content">
+            <div class="info-box success">
+              <h4>Conducta Recomendada</h4>
+              <ul>
+                <li><strong>Activar Protocolo de Code Infarto/IAMCEST.</strong></li>
+                <li><strong>Antiagregación Dual:</strong> Aspirina 162-325 mg (masticable) + Inhibidor P2Y12 (Ticagrelor 180 mg o Clopidogrel 600 mg).</li>
+                <li><strong>Anticoagulación:</strong> Heparina no fraccionada (bolo 70-100 U/kg) o Bivalirudina.</li>
+                <li><strong>Tratamiento adjunto:</strong> Nitratos IV si dolor persistente, Betabloqueantes oral si no hay IC, Estatinas de alta intensidad (Atorvastatina 80 mg).</li>
+                <li><strong>Preparar para cateterismo cardíaco inmediato.</strong></li>
+              </ul>
+            </div>
+            <div class="actions">
+              <button class="primary" onclick="location.reload()">Reiniciar Algoritmo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 7B: Manejo - Trombólisis -->
+        <div class="card step" data-step="8">
+          <h2>Manejo: Trombólisis Farmacológica</h2>
+          <div class="content">
+            <div class="info-box">
+              <h4>Selección de Fibrinolítico y Cálculo de Dosis Exacta</h4>
+              <p><strong>Dosis calculada para un peso de <span id="weightForDose" class="calculated-value">--</span> kg.</p>
+              <label for="fibrinolytic">Seleccione el fármaco:</label>
+              <select id="fibrinolytic">
+                <option value="tnk">Tenecteplasa (TNK-tPA)</option>
+                <option value="alteplase">Alteplasa (tPA)</option>
+                <option value="streptokinase">Estreptoquinasa</option>
+              </select>
+              <div id="dosisCalculada" style="margin-top: 12px; font-weight: bold;"></div>
+            </div>
+
+            <div class="info-box" style="margin-top: 16px;">
+                <h4>Control de Parámetros Previos a la Trombólisis</h4>
+                <div class="row-3">
+                    <div>
+                        <label for="sbp">Presión Arterial Sistólica (mmHg)</label>
+                        <input type="number" id="sbp" placeholder="Ej: 150">
+                    </div>
+                    <div>
+                        <label for="glucose">Glucosa (mg/dL)</label>
+                        <input type="number" id="glucose" placeholder="Ej: 110">
+                    </div>
+                    <div>
+                        <label for="bicarbonate">Bicarbonato (mEq/L)</label>
+                        <input type="number" id="bicarbonate" placeholder="Ej: 24">
+                    </div>
+                </div>
+                <div id="preThrombolysisRecommendations" class="calculation-result" style="display:none;"></div>
+            </div>
+            
+            <div class="info-box" style="margin-top: 16px;">
+              <h4>Lista de Chequeo de Contraindicaciones</h4>
+              <p class="warning">Revise cuidadosamente. Cualquier contraindicación mayor es una alerta roja.</p>
+              <h5>Contraindicaciones Mayores</h5>
+              <ul class="contraindications-list">
+                <li><label><input type="checkbox" name="contra-major"> Hemorragia intracraneana previa.</label></li>
+                <li><label><input type="checkbox" name="contra-major"> Neoplasia intracraneana conocida.</label></li>
+                <li><label><input type="checkbox" name="contra-major"> ACV isquémico en los últimos 3 meses.</label></li>
+                <li><label><input type="checkbox" name="contra-major"> Sangrado activo significativo.</label></li>
+                <li><label><input type="checkbox" name="contra-major"> Disección aórtica.</label></li>
+              </ul>
+              <h5>Contraindicaciones Relativas</h5>
+              <ul class="contraindications-list">
+                <li><label><input type="checkbox" name="contra-relative"> TIA en los últimos 6 meses.</label></li>
+                <li><label><input type="checkbox" name="contra-relative"> Tratamiento anticoagulante oral.</label></li>
+                <li><label><input type="checkbox" name="contra-relative"> Hipertensión refractaria (PAS > 180 mmHg).</label></li>
+              </ul>
+            </div>
+            <div class="actions">
+              <button class="ghost" data-back="6">Volver</button>
+              <button class="primary" data-next="14" data-require="fibrinolytic">Ver Recomendación Final</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Paso 4B: Rama NO Elevación del ST (SCASEST) -->
+        <div class="card step" data-step="9">
+          <h2>Paso 4: SCASEST - Cálculo de Delta de Troponina</h2>
+          <div class="content">
+            <p>Para confirmar el diagnóstico, se requiere evaluar el cambio dinámico de la troponina.</p>
+            <div class="row">
+              <div>
+                <label for="troponinInitial">Troponina Inicial (ng/L o pg/mL)</label>
+                <input type="number" id="troponinInitial" step="0.01" placeholder="Ej: 15.0">
+              </div>
+              <div>
+                <label for="troponinRepeat">Troponina de Control (1-3h después) (ng/L o pg/mL)</label>
+                <input type="number" id="troponinRepeat" step="0.01" placeholder="Ej: 55.0">
+              </div>
+            </div>
+            <p class="hint"><strong>Regla práctica:</strong> Un cambio relativo (delta) mayor o igual al 30% (hacia arriba o hacia abajo) se considera significativo.</p>
+            
+            <div id="deltaResult" class="info-box" style="display:none;">
+                <h4>Resultado del Delta</h4>
+                <p><strong>Delta Calculado:</strong> <span id="deltaValue" class="calculated-value">--</span> %</p>
+                <p><strong>Interpretación:</strong> <span id="deltaInterpretation">--</span></p>
+            </div>
+            <div class="actions">
+              <button class="ghost" data-back="3">Volver</button>
+              <button class="primary" data-next="10" data-require="troponinInitial">Siguiente</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 10: Datos Clínicos para SCASEST con Cálculos -->
+        <div class="card step" data-step="10">
+          <h2>Paso 5: SCASEST - Estratificación de Riesgo y Comorbilidades</h2>
+          <div class="content">
+            <p>Para personalizar el manejo, necesitamos datos clínicos precisos. La herramienta calculará la función renal y la clase de Killip.</p>
+            
+            <div class="info-box">
+                <h4>Función Renal</h4>
+                <div class="row">
+                    <div>
+                        <label for="creatinine">Creatinina Sérica (mg/dL)</label>
+                        <input type="number" id="creatinine" step="0.01" placeholder="Ej: 1.2" />
+                    </div>
+                    <div>
+                        <label for="race">Raza (para cálculo de TFG)</label>
+                        <select id="race">
+                            <option value="white">Blanco/Hispano/Asiático</option>
+                            <option value="black">Negro/Afroamericano</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="gfrResult" class="calculation-result" style="display:none;">
+                    <p><strong>TFG (CKD-EPI 2021):</strong> <span id="gfrValue" class="calculated-value">--</span> mL/min/1.73m²</p>
+                    <p><strong>Interpretación:</strong> <span id="gfrInterpretation">--</span></p>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top:16px;">
+                <h4>Clasificación de Killip (Insuficiencia Cardíaca)</h4>
+                <p>Marque los hallazgos al examen físico para determinar la clase:</p>
+                <div style="margin-top: 12px;">
+                    <label><input type="checkbox" name="killip" value="i"> No hay signos de insuficiencia cardíaca.</label>
+                    <label><input type="checkbox" name="killip" value="s3"> Tercer ruido (galope) o ingurgitación yugular.</label>
+                    <label><input type="checkbox" name="killip" value="rales50"> Crepitaciones en < 50% de los campos pulmonares.</label>
+                    <label><input type="checkbox" name="killip" value="rales50_plus"> Crepitaciones en > 50% de los campos pulmonares (EAP).</label>
+                    <label><input type="checkbox" name="killip" value="hypotension"> Hipotensión (PAS < 90 mmHg).</label>
+                    <label><input type="checkbox" name="killip" value="hypoperfusion"> Signos de hipoperfusión periférica.</label>
+                </div>
+                <div id="killipResult" class="calculation-result" style="display:none;">
+                    <p><strong>Clase de Killip:</strong> <span id="killipClass" class="calculated-value">--</span></p>
+                </div>
+            </div>
+            <div class="actions">
+              <button class="ghost" data-back="9">Volver</button>
+              <button class="primary" data-next="11" data-require="creatinine">Ver Plan de Manejo</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paso 11: Plan de Manejo SCASEST Personalizado -->
+        <div class="card step" data-step="11">
+          <h2>Paso 6: SCASEST - Plan de Manejo Personalizado</h2>
+          <div class="content">
+            <div id="scasestManagementPlan"></div>
+             <div class="actions">
+              <button class="primary" onclick="location.reload()">Reiniciar Algoritmo</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Paso Final: Recomendación de Trombólisis -->
+        <div class="card step" data-step="14">
+          <h2>Recomendación Final: Trombólisis</h2>
+          <div class="content">
+            <div id="finalThrombolysisRecommendation"></div>
+             <div class="actions">
+              <button class="primary" onclick="location.reload()">Reiniciar Algoritmo</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Rama de Dolor No Isquémico -->
+        <div class="card step" data-step="15">
+          <h2>Dolor Torácico No Isquémico</h2>
+          <div class="content">
+            <div class="info-box">
+              <p>La probabilidad de un Síndrome Coronario Agudo es baja. Se recomienda investigar otras etiologías del dolor torácico.</p>
+              <h4>Diagnósticos Diferenciales a Considerar:</h4>
+              <ul>
+                <li><strong>Dolor Pleurítico:</strong> TEP, Neumonía, Neumotórax.</li>
+                <li><strong>Dolor Posicional/Reproducible:</strong> Traumatismo costal, Costocondritis.</li>
+                <li><strong>Otros:</strong> Disección Aórtica, Pericarditis, ERGE, Herpes Zóster.</li>
+              </ul>
+            </div>
+            <div class="actions">
+              <button class="primary" onclick="location.reload()">Reiniciar Algoritmo</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- PANEL LATERAL -->
+      <aside id="summaryPanel">
+        <div class="card">
+          <h2>Resumen del Paciente</h2>
+          <div class="content">
+            <div class="summary-item"><strong>Edad:</strong> <span id="summaryAge">--</span></div>
+            <div class="summary-item"><strong>Sexo:</strong> <span id="summarySex">--</span></div>
+            <div class="summary-item"><strong>Peso:</strong> <span id="summaryWeight">--</span></div>
+            <div class="summary-item"><strong>Dolor:</strong> <span id="summaryPain">--</span></div>
+            <div class="summary-item"><strong>Lesión:</strong> <span id="summaryLesion">--</span></div>
+            <div class="summary-item"><strong>Localización:</strong> <span id="summaryLocation">--</span></div>
+            <div class="summary-item"><strong>Estrategia:</strong> <span id="summaryStrategy">--</span></div>
+            <div class="summary-item"><strong>Killip:</strong> <span id="summaryKillip">--</span></div>
+            <div class="summary-item"><strong>TFG:</strong> <span id="summaryGFR">--</span></div>
+            <div class="summary-item"><strong>Seguridad:</strong> <span id="summarySafety">--</span></div>
+          </div>
+        </div>
+      </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const patientData = {};
+
+      function showStep(stepNumber) {
+        document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+        const targetStep = document.querySelector(`[data-step="${stepNumber}"]`);
+        if (targetStep) {
+          targetStep.classList.add('active');
+        }
+        updateSummary();
+      }
+
+      function updateSummary() {
+        document.getElementById('summaryAge').textContent = patientData.age ? `${patientData.age} años` : '--';
+        document.getElementById('summarySex').textContent = patientData.sex ? (patientData.sex === 'M' ? 'Masculino' : 'Femenino') : '--';
+        document.getElementById('summaryWeight').textContent = patientData.weight ? `${patientData.weight} kg` : '--';
+        document.getElementById('summaryPain').textContent = patientData.painType ? (patientData.painType === 'tipico' ? 'Anginoso' : 'No Isquémico') : '--';
+        document.getElementById('summaryLesion').textContent = patientData.lesionType ? (patientData.lesionType === 'subepicardic' ? 'Subepicárdica (STEMI)' : 'Subendocárdica (SCASEST)') : '--';
+        document.getElementById('summaryLocation').textContent = patientData.location ? patientData.location : '--';
+        document.getElementById('summaryStrategy').textContent = patientData.hemodinamia ? (patientData.hemodinamia === 'si' ? 'Angioplastía Primaria' : 'Trombólisis') : '--';
+        document.getElementById('summaryKillip').textContent = patientData.killipClass || '--';
+        document.getElementById('summaryGFR').textContent = patientData.gfr ? `${patientData.gfr} mL/min/1.73m²` : '--';
+        document.getElementById('summarySafety').textContent = patientData.safetyStatus || '--';
+      }
+      
+      function interpretECG() {
+        const selectedLeads = Array.from(document.querySelectorAll('input[name="lead"]:checked')).map(cb => cb.value);
+        const locationResultDiv = document.getElementById('locationResult');
+        const faceSpan = document.getElementById('face');
+        const arterySpan = document.getElementById('artery');
+        const posteriorHint = document.getElementById('posteriorLeadsHint');
+        
+        let face = '';
+        let artery = '';
+
+        const isAnterior = selectedLeads.some(l => ['V1', 'V2', 'V3', 'V4'].includes(l));
+        const isInferior = selectedLeads.some(l => ['II', 'III', 'aVF'].includes(l));
+        const isLateral = selectedLeads.some(l => ['I', 'aVL', 'V5', 'V6'].includes(l));
+
+        if (isAnterior) { face += 'Anterior '; artery += 'Descendente Anterior (ADA)'; }
+        if (isInferior) { face += 'Inferior '; artery += artery ? ' o Coronaria Derecha (CD)' : 'Coronaria Derecha (CD)'; }
+        if (isLateral) { face += 'Lateral '; artery += artery ? ' o Circunfleja (CX)' : 'Circunfleja (CX)'; }
+        
+        faceSpan.textContent = face.trim() || 'Indeterminada';
+        arterySpan.textContent = artery.trim() || 'Indeterminada';
+        locationResultDiv.style.display = 'block';
+        posteriorHint.style.display = isInferior ? 'block' : 'none';
+        
+        patientData.location = `${face.trim()} (${artery.trim()})`;
+      }
+      
+      function calculateDelta() {
+        const initial = parseFloat(document.getElementById('troponinInitial').value);
+        const repeat = parseFloat(document.getElementById('troponinRepeat').value);
+        const percentThreshold = 30; // User-defined threshold
+
+        if (isNaN(initial) || isNaN(repeat) || initial <= 0) {
+            document.getElementById('deltaResult').style.display = 'none';
+            patientData.significantDelta = false;
+            return;
+        }
+
+        const delta = ((repeat - initial) / initial) * 100;
+        const isSignificant = Math.abs(delta) >= percentThreshold;
+        
+        document.getElementById('deltaValue').textContent = delta.toFixed(1);
+        const interp = document.getElementById('deltaInterpretation');
+        if (isSignificant) {
+          interp.innerHTML = '<span class="success">Delta significativo (≥30%). Fuerte evidencia de SCASEST.</span>';
+          patientData.significantDelta = true;
+        } else {
+          interp.innerHTML = '<span class="warning">Delta no significativo (<30%). Considerar otras causas o repetir enzimas.</span>';
+          patientData.significantDelta = false;
+        }
+        document.getElementById('deltaResult').style.display = 'block';
+      }
+
+      function calculateeGFR() {
+        const creatinine = parseFloat(document.getElementById('creatinine').value);
+        const age = parseInt(patientData.age);
+        const sex = patientData.sex;
+        const race = document.getElementById('race').value;
+
+        if (!creatinine || !age || !sex) {
+            document.getElementById('gfrResult').style.display = 'none';
+            patientData.gfr = null;
+            return;
+        }
+
+        const isFemale = sex === 'F';
+        const isBlack = race === 'black';
+        
+        let k, a;
+        if (isFemale) {
+            k = 0.7; a = -0.329;
+        } else {
+            k = 0.9; a = -0.411;
+        }
+
+        const creatinineStandard = (creatinine / k <= 1) ? Math.pow(creatinine / k, a) : Math.pow(creatinine / k, -1.209);
+        
+        let gfr = 142 * Math.min(creatinine / k, 1) * creatinineStandard;
+        gfr *= Math.pow(0.9938, age);
+        gfr *= isFemale ? 1.012 : 1;
+        gfr *= isBlack ? 1.026 : 1;
+
+        patientData.gfr = Math.round(gfr);
+
+        let interpretation = '';
+        if (patientData.gfr >= 90) {
+            interpretation = 'Función renal normal o hiperfiltración.';
+        } else if (patientData.gfr >= 60) {
+            interpretation = 'Función renal normal.';
+        } else if (patientData.gfr >= 45) {
+            interpretation = 'Leve descenso de la función renal (ERC Estadio G3a).';
+        } else if (patientData.gfr >= 30) {
+            interpretation = 'Descenso moderado de la función renal (ERC Estadio G3b).';
+        } else if (patientData.gfr >= 15) {
+            interpretation = 'Descenso severo de la función renal (ERC Estadio G4).';
+        } else {
+            interpretation = 'Insuficiencia Renal (ERC Estadio G5).';
+        }
+
+        document.getElementById('gfrValue').textContent = patientData.gfr;
+        document.getElementById('gfrInterpretation').textContent = interpretation;
+        document.getElementById('gfrResult').style.display = 'block';
+      }
+
+      function calculateKillip() {
+        const checkboxes = document.querySelectorAll('input[name="killip"]:checked');
+        const values = Array.from(checkboxes).map(cb => cb.value);
+
+        let killipClass = 'I';
+        if (values.includes('rales50_plus')) killipClass = 'III';
+        if (values.includes('hypotension') || values.includes('hypoperfusion')) killipClass = 'IV';
+        if (killipClass === 'I' && (values.includes('s3') || values.includes('rales50'))) killipClass = 'II';
+        
+        patientData.killipClass = killipClass;
+
+        document.getElementById('killipClass').textContent = `Clase ${killipClass}`;
+        document.getElementById('killipResult').style.display = 'block';
+      }
+
+      function generateSCASESTPlan() {
+        const weight = patientData.weight;
+        const age = patientData.age;
+        const gfr = patientData.gfr;
+        const killipClass = patientData.killipClass;
+        const significantDelta = patientData.significantDelta;
+
+        let plan = '<div class="info-box"><h4>Plan de Manejo Personalizado para SCASEST</h4>';
+        
+        // Antiagregación
+        plan += `<h5>1. Antiagregación Dual:</h5><ul>`;
+        plan += `<li><strong>Aspirina:</strong> 162-325 mg (masticable) ahora, luego 75-100 mg/día.</li>`;
+        plan += `<li><strong>Inhibidor P2Y12:</strong> Ticagrelor 180 mg (carga) luego 90 mg c/12h <strong>O</strong> Clopidogrel 600 mg (carga) luego 75 mg/día.</li>`;
+        plan += `</ul>`;
+
+        // Anticoagulación
+        plan += `<h5>2. Anticoagulación (Elegir una):</h5><ul>`;
+        let enoxaparinDose = '1 mg/kg SC cada 12 horas.';
+        if (gfr < 30) {
+            enoxaparinDose = '1 mg/kg SC una vez al día (o 0.75 mg/kg c/12h) o considerar HNF.';
+        }
+        plan += `<li><strong>Enoxaparina:</strong> ${enoxaparinDose} (Ajustado a TFG de ${gfr} mL/min/1.73m²).</li>`;
+        plan += `<li><strong>Heparina no fraccionada:</strong> Bolo IV seguido de infusión para mantener TTPA 1.5-2.5x control.</li>`;
+        plan += `</ul>`;
+
+        // Betabloqueantes
+        plan += `<h5>3. Betabloqueantes:</h5><ul>`;
+        if (killipClass === 'III' || killipClass === 'IV') {
+            plan += `<li class="error"><strong>CONTRAINDICADO:</strong> Presencia de Insuficiencia Cardíaca avanzada (Killip ${killipClass}). No usar betabloqueantes IV.</li>`;
+        } else if (killipClass === 'II' || (age && parseInt(age) > 75)) {
+            plan += `<li class="warning"><strong>USAR CON EXTREMA PRECAUCIÓN:</strong> Signos de IC (Killip II) o edad avanzada. Considerar dosis muy bajas de Metoprolol oral (12.5 mg).</li>`;
+        } else {
+            plan += `<li><strong>Metoprolol:</strong> 25-50 mg VO cada 12 horas, si no hay contraindicaciones.</li>`;
+        }
+        plan += `</ul>`;
+
+        // Estrategia Invasiva
+        plan += `<h5>4. Estrategia Invasiva (Cateterismo):</h5><ul>`;
+        if (significantDelta || (patientData.troponinInitial && parseFloat(patientData.troponinInitial) > 50)) {
+            plan += `<li class="success"><strong>Alto Riesgo:</strong> Se recomienda una estrategia invasiva temprana (cateterismo en < 24 horas).</li>`;
+        } else {
+            plan += `<li><strong>Riesgo Intermedio/Bajo:</strong> Se puede optar por una estrategia invasiva selectiva o realizar prueba de isquemia no invasiva primero.</li>`;
+        }
+        plan += `</ul>`;
+
+        // Otros
+        plan += `<h5>5. Tratamiento Adyuvante:</h5><ul>`;
+        plan += `<li><strong>Estatina de alta intensidad:</strong> Atorvastatina 80 mg VO/día.</li>`;
+        plan += `<li><strong>IECA/ARA II:</strong> Iniciar si hay HTA, diabetes, disfunción sistólica o IC.</li>`;
+        plan += `</ul>`;
+
+        plan += `</div>`;
+        document.getElementById('scasestManagementPlan').innerHTML = plan;
+      }
+      
+      function calculateDose() {
+        const weight = parseFloat(patientData.weight);
+        const drug = document.getElementById('fibrinolytic').value;
+        const dosisDiv = document.getElementById('dosisCalculada');
+        if (!weight || isNaN(weight)) {
+          dosisDiv.innerHTML = '<p class="error">Por favor, ingrese el peso del paciente en el Paso 1.</p>';
+          return;
+        }
+        document.getElementById('weightForDose').textContent = weight;
+        let dose = '';
+        switch(drug) {
+          case 'tnk':
+            if (weight < 60) dose = '30 mg (bolo IV único)';
+            else if (weight >= 60 && weight < 70) dose = '35 mg (bolo IV único)';
+            else if (weight >= 70 && weight < 80) dose = '40 mg (bolo IV único)';
+            else if (weight >= 80 && weight < 90) dose = '45 mg (bolo IV único)';
+            else dose = '50 mg (bolo IV único)';
+            break;
+          case 'alteplase':
+            const infusion1 = Math.min(0.75 * weight, 50);
+            const infusion2 = Math.min(0.5 * weight, 35);
+            const totalDose = 15 + infusion1 + infusion2;
+            dose = `Bolo de 15 mg IV. Infusión: ${infusion1.toFixed(1)} mg en 30 min, seguido de ${infusion2.toFixed(1)} mg en 60 min. <strong>Total: ${totalDose.toFixed(1)} mg.</strong>`;
+            break;
+          case 'streptokinase':
+            dose = `1.5 Millones de UI en 30-60 min IV.`;
+            break;
+        }
+        dosisDiv.innerHTML = `<p><strong>Dosis exacta calculada:</strong> ${dose}</p>`;
+      }
+
+      function checkPreThrombolysisParams() {
+        const sbp = parseInt(patientData.sbp);
+        const glucose = parseInt(patientData.glucose);
+        const bicarbonate = parseInt(patientData.bicarbonate);
+        const recommendationsDiv = document.getElementById('preThrombolysisRecommendations');
+        let recommendations = '';
+
+        // Hipertensión
+        if (sbp && sbp > 180) {
+            recommendations += `<div class="error"><strong>ALERTA DE HIPERTENSIÓN (PAS: ${sbp} mmHg):</strong> Es necesario controlar la PA antes de la trombólisis.</div>`;
+            recommendations += `<h5>Opción 1: Labetalol IV</h5><p>Bolo IV lento de 20 mg. Si no responde, repetir 40-80 mg cada 10 min hasta un máximo de 300 mg.</p>`;
+            recommendations += `<h5>Opción 2: Nitroglicerina IV</h5><p>Infusión IV starting at 5 mcg/min, titrating up to 100 mcg/min as needed to control BP.</p>`;
+        } else if (sbp) {
+            recommendations += `<div class="success">Presión Arterial controlada (PAS: ${sbp} mmHg).</div>`;
+        }
+
+        // Glucosa
+        if (glucose && glucose > 250) {
+            recommendations += `<div class="warning"><strong>HIPERGLUCEMIA (Glucosa: ${glucose} mg/dL):</strong> Considerar manejo con insulina si es > 250 mg/dL con cetoacidosis.</div>`;
+        } else if (glucose) {
+            recommendations += `<div class="success">Glucosa dentro de rangos aceptables (${glucose} mg/dL).</div>`;
+        }
+
+        // Bicarbonato
+        if (bicarbonate && bicarbonate < 22) {
+            recommendations += `<div class="error"><strong>BAJO BICARBONATO (Bicarbonato: ${bicarbonate} mEq/L):</strong> Alerta de posible acidosis metabólica. Evaluar causa, es una contraindicación relativa.</div>`;
+        } else if (bicarbonate) {
+            recommendations += `<div class="success">Bicarbonato dentro de rangos normales (${bicarbonate} mEq/L).</div>`;
+        }
+
+        if (recommendations) {
+            recommendationsDiv.innerHTML = recommendations;
+            recommendationsDiv.style.display = 'block';
+        } else {
+            recommendationsDiv.style.display = 'none';
+        }
+      }
+
+      function checkContraindications() {
+        const major = document.querySelectorAll('input[name="contra-major"]:checked').length;
+        const relative = document.querySelectorAll('input[name="contra-relative"]:checked').length;
+        let message = '';
+        if (major > 0) {
+          message = `<div class="error"><strong>ALERTA:</strong> Se detectaron ${major} contraindicación(es) mayor(es). La trombólisis está contraindicada. Reconsidere la estrategia de reperfusión (ej. traslado rápido para PCI).</div>`;
+          patientData.safetyStatus = 'Contraindicado';
+        } else if (relative > 2) {
+          message = `<div class="warning"><strong>PRECAUCIÓN:</strong> Se detectaron ${relative} contraindicaciones relativas. Evalúe cuidadosamente el riesgo-beneficio antes de proceder.</div>`;
+          patientData.safetyStatus = 'Precaución';
+        } else {
+          message = `<div class="success">No se detectaron contraindicaciones mayores aparentes. Proceder con precaución.</div>`;
+          patientData.safetyStatus = 'Aparentemente seguro';
+        }
+        
+        // Combine all safety recommendations
+        const doseHtml = document.getElementById('dosisCalculada').innerHTML;
+        const paramsHtml = document.getElementById('preThrombolysisRecommendations').innerHTML;
+        document.getElementById('finalThrombolysisRecommendation').innerHTML = message + doseHtml + paramsHtml;
+      }
+      
+      // Event Listener Principal para Navegación
+      document.querySelectorAll('button[data-next], button[data-back]').forEach(button => {
+        button.addEventListener('click', function() {
+          const currentStep = this.closest('.step');
+          const currentStepNumber = parseInt(currentStep.dataset.step);
+          let nextStep = null;
+          
+          // Validar y guardar datos del paso actual
+          if (currentStepNumber === 1) {
+            patientData.age = document.getElementById('age').value;
+            patientData.sex = document.getElementById('sex').value;
+            patientData.weight = document.getElementById('weight').value;
+            if (!patientData.age || !patientData.sex || !patientData.weight) { 
+              alert('Por favor, complete todos los datos demográficos con valores válidos.'); 
+              return; 
+            }
+            nextStep = this.dataset.next;
+          }
+          if (currentStepNumber === 2) {
+            const painType = document.querySelector('input[name="painType"]:checked');
+            if (!painType) { alert('Por favor, seleccione el tipo de dolor.'); return; }
+            patientData.painType = painType.value;
+            nextStep = (painType.value === 'no-isquemico') ? '15' : this.dataset.next;
+          }
+          if (currentStepNumber === 3) {
+            const ecgChanges = document.querySelector('input[name="ecgChanges"]:checked');
+            if (!ecgChanges) { alert('Por favor, seleccione una opción para los cambios en el ECG.'); return; }
+            patientData.ecgChanges = ecgChanges.value;
+            nextStep = (ecgChanges.value === 'no') ? '9' : this.dataset.next;
+          }
+          if (currentStepNumber === 4) {
+            const leads = document.querySelectorAll('input[name="lead"]:checked');
+            if (leads.length === 0) { alert('Por favor, seleccione al menos una derivación afectada.'); return; }
+            interpretECG();
+            nextStep = this.dataset.next;
+          }
+          if (currentStepNumber === 5) {
+            const lesionType = document.querySelector('input[name="lesionType"]:checked');
+            if (!lesionType) { alert('Por favor, clasifique el tipo de lesión.'); return; }
+            patientData.lesionType = lesionType.value;
+            nextStep = (lesionType.value === 'subendocardic') ? '9' : this.dataset.next;
+          }
+          if (currentStepNumber === 6) {
+            const hemodinamia = document.querySelector('input[name="hemodinamia"]:checked');
+            if (!hemodinamia) { alert('Por favor, seleccione una opción sobre la disponibilidad de hemodinamia.'); return; }
+            patientData.hemodinamia = hemodinamia.value;
+            nextStep = (hemodinamia.value === 'si') ? '7' : '8';
+          }
+          if (currentStepNumber === 8) {
+            patientData.sbp = document.getElementById('sbp').value;
+            patientData.glucose = document.getElementById('glucose').value;
+            patientData.bicarbonate = document.getElementById('bicarbonate').value;
+            calculateDose();
+            checkPreThrombolysisParams();
+            checkContraindications();
+            nextStep = this.dataset.next;
+          }
+          if (currentStepNumber === 9) {
+            patientData.troponinInitial = document.getElementById('troponinInitial').value;
+            patientData.troponinRepeat = document.getElementById('troponinRepeat').value;
+            if (!patientData.troponinInitial) { alert('Por favor, ingrese al menos el valor de troponina inicial.'); return; }
+            calculateDelta();
+            nextStep = this.dataset.next;
+          }
+          if (currentStepNumber === 10) {
+            patientData.creatinine = document.getElementById('creatinine').value;
+            patientData.race = document.getElementById('race').value;
+            if (!patientData.creatinine) { alert('Por favor, ingrese el valor de creatinina.'); return; }
+            calculateeGFR();
+            calculateKillip();
+            generateSCASESTPlan();
+            nextStep = this.dataset.next;
+          }
+
+          // Navegar al siguiente o anterior paso
+          if (this.dataset.next && nextStep) {
+            showStep(parseInt(nextStep));
+          } else if (this.dataset.back) {
+            showStep(parseInt(this.dataset.back));
+          }
+        });
+      });
+
+      // Real-time updates listeners
+      document.getElementById('fibrinolytic').addEventListener('change', calculateDose);
+      document.querySelectorAll('input[name="lead"]').forEach(cb => cb.addEventListener('change', interpretECG));
+      document.getElementById('creatinine').addEventListener('input', calculateeGFR);
+      document.getElementById('race').addEventListener('change', calculateeGFR);
+      document.querySelectorAll('input[name="killip"]').forEach(cb => cb.addEventListener('change', calculateKillip));
+      document.getElementById('troponinInitial').addEventListener('input', calculateDelta);
+      document.getElementById('troponinRepeat').addEventListener('input', calculateDelta);
+      document.querySelectorAll('input[name="contra-major"], input[name="contra-relative"]').forEach(cb => cb.addEventListener('change', checkContraindications));
+      document.getElementById('sbp').addEventListener('input', checkPreThrombolysisParams);
+      document.getElementById('glucose').addEventListener('input', checkPreThrombolysisParams);
+      document.getElementById('bicarbonate').addEventListener('input', checkPreThrombolysisParams);
+
+    });
+  </script>
+</body>
+</html>
